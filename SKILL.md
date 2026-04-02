@@ -384,6 +384,7 @@ The complete file structure to use (or preserve) for the HTML:
     <div class="subsection">
       <div class="subsection-label">Core · Custom</div>
       <div class="card-grid">
+        <!-- each custom skill gets its own .card — never nest subsection-label inside card-grid -->
         <div class="card"><div class="card-name green">skill-name</div><div class="card-desc">description</div></div>
       </div>
     </div>
