@@ -59,4 +59,8 @@ Re-run `/dashboard-refresh` any time you install a new plugin, add an MCP server
 ## Notes
 
 - MCP servers configured in Claude's developer settings must be added to the dashboard manually — they can't be auto-detected
-- claude.ai connected connectors (Zapier, Notion, Gamma, etc.) are detected automatically from your session context
+- claude.ai connected connectors (Zapier, Notion, Gamma, etc.) are detected automatically from your session context.
+
+<img width="1458" height="965" alt="Screenshot 2026-04-02 at 14 38 54" src="https://github.com/user-attachments/assets/d95a697b-7ce3-4af2-8500-595dfc9f85d9" />
+
+
