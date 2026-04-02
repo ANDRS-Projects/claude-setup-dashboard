@@ -1,8 +1,7 @@
 # Claude Setup Dashboard
 
 A Claude Code skill that generates a visual dashboard of your Claude setup — agents, skills, hooks, and MCP servers — as a styled HTML file you can open in any browser.
-
-![Dark and light mode dashboard](https://github.com/carolinevrauwdeunt-lab/claude-setup-dashboard/raw/main/preview.png)
+<img width="1458" height="965" alt="Screenshot 2026-04-02 at 14 33 14" src="https://github.com/user-attachments/assets/85528d32-be24-447a-a0fc-c5dc14fff708" />
 
 ---
 
