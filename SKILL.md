@@ -276,6 +276,8 @@ The complete file structure to use (or preserve) for the HTML:
   .card:hover { border-color:rgba(124,107,255,0.4); background:var(--surface2); }
   .card-name { font-family:'DM Mono',monospace; font-size:12px; font-weight:500; color:var(--accent);
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  /* color convention: agents = default purple, skills = green, knowledge = gold */
+  /* agent `color` frontmatter does NOT map to card color — all agents use plain card-name (purple) */
   .card-name.green { color:var(--accent3); }
   .card-name.pink  { color:var(--accent2); }
   .card-name.gold  { color:var(--accent4); }
