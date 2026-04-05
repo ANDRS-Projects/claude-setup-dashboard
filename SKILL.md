@@ -13,6 +13,7 @@ Run `/dashboard-refresh` when:
 - You want to create the dashboard for the first time (no files needed)
 - You installed a new plugin, agent, or skill
 - You added or removed MCP servers or hooks
+- You added files to `~/.claude/knowledge/`
 
 ## Target Files
 
@@ -61,6 +62,12 @@ Scan these sources:
 - Local servers: read `~/.claude/settings.json` → `mcpServers` key. These go under "Core · Local (Developer Settings)"
 - claude.ai connectors: infer from `mcp__claude_ai_<Name>__*` tool names in the system-reminder. Each unique `<Name>` is a connector. These go under "Core · claude.ai Connected Connectors"
 - Plugin MCPs: look for `mcp__plugin_<plugin>_<server>__*` tool prefixes in the system-reminder
+
+### Knowledge Library (optional)
+- Check if `~/.claude/knowledge/` exists
+- If it does: list all `.md` files excluding `README.md`
+- For each file, extract: the filename (slug) and the first `# ` heading as the title
+- If the folder does not exist, skip this section entirely — do not create an empty section
 
 ---
 
@@ -157,6 +164,15 @@ Write `claude-code-capabilities.md` using today's date. Structure:
 | MCP Server | Key Tools |
 |---|---|
 ...
+
+## Knowledge Library
+> Only include this section if `~/.claude/knowledge/` exists and contains .md files.
+
+| File | Title |
+|---|---|
+| `filename` | First # heading from the file |
+
+> Location: `~/.claude/knowledge/`
 ```
 
 ---
@@ -239,10 +255,11 @@ The complete file structure to use (or preserve) for the HTML:
     padding-bottom:20px; border-bottom:1px solid var(--border); }
   .section-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center;
     justify-content:center; font-size:18px; flex-shrink:0; }
-  .icon-agents { background:linear-gradient(135deg,rgba(124,107,255,0.3),rgba(124,107,255,0.1)); }
-  .icon-skills { background:linear-gradient(135deg,rgba(107,255,216,0.3),rgba(107,255,216,0.1)); }
-  .icon-hooks  { background:linear-gradient(135deg,rgba(255,217,107,0.3),rgba(255,217,107,0.1)); }
-  .icon-mcp    { background:linear-gradient(135deg,rgba(255,107,157,0.3),rgba(255,107,157,0.1)); }
+  .icon-agents     { background:linear-gradient(135deg,rgba(124,107,255,0.3),rgba(124,107,255,0.1)); }
+  .icon-skills     { background:linear-gradient(135deg,rgba(107,255,216,0.3),rgba(107,255,216,0.1)); }
+  .icon-hooks      { background:linear-gradient(135deg,rgba(255,217,107,0.3),rgba(255,217,107,0.1)); }
+  .icon-mcp        { background:linear-gradient(135deg,rgba(255,107,157,0.3),rgba(255,107,157,0.1)); }
+  .icon-knowledge  { background:linear-gradient(135deg,rgba(107,255,216,0.2),rgba(124,107,255,0.2)); }
   h2 { font-family:'Syne',sans-serif; font-size:28px; font-weight:700; letter-spacing:-0.01em; }
   .section-count { margin-left:auto; font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); letter-spacing:0.08em; }
   .subsection { margin-bottom:40px; }
@@ -333,6 +350,7 @@ The complete file structure to use (or preserve) for the HTML:
       <a href="#skills">Skills</a>
       <a href="#hooks">Hooks</a>
       <a href="#mcp">MCP Servers</a>
+      <a href="#knowledge">Knowledge</a>
     </div>
   </nav>
 
@@ -470,6 +488,27 @@ The complete file structure to use (or preserve) for the HTML:
     </div>
   </section>
 
+  <!-- KNOWLEDGE SECTION — only render if ~/.claude/knowledge/ exists and has .md files -->
+  <section id="knowledge">
+    <div class="section-header">
+      <div class="section-icon icon-knowledge">📚</div>
+      <h2>Knowledge Library</h2>
+      <span class="section-count">N notes</span>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-label">~/.claude/knowledge</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-name gold">filename-slug</div>
+          <div class="card-desc">Title extracted from first # heading</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="invoke-hint">Explanatory notes on how Claude Code works — concepts, comparisons, mental models. Not rules (memory) or prompts (skills).</div>
+  </section>
+
 </div>
 
 <script>
@@ -519,6 +558,7 @@ After writing both files confirm:
 - Date updated to today in both files
 - Counts in HTML header match actual totals
 - All agents/skills/hooks/MCPs from Step 2 are present
+- Knowledge section present if `~/.claude/knowledge/` exists, absent if it doesn't
 - In Refresh mode: no items removed unless they genuinely no longer exist
 
 ---
@@ -529,3 +569,4 @@ After writing both files confirm:
 - "Core · Local (Developer Settings)" entries must be maintained manually — do not auto-remove them.
 - claude.ai connectors come from `mcp__claude_ai_<Name>__*` tool prefixes. Each unique `<Name>` is one connector.
 - If the target folder doesn't exist, the Write tool will create it automatically.
+- Knowledge Library section is optional and plugin-independent — include it only if `~/.claude/knowledge/` exists. Any user can create this folder to get the section.
