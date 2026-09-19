@@ -7,12 +7,13 @@ A Claude Code skill that generates a visual dashboard of your Claude setup — a
 
 ## What it generates
 
-A single HTML file (`claude-code-capabilities-styled_1.html`) with five sections:
+A single HTML file (`claude-code-capabilities-styled_1.html`) with up to six sections:
 
 - **Agents** — all agents available to you, grouped by plugin or custom
 - **Skills** — all slash commands (`/skill-name`), grouped and categorised
 - **Hooks** — automated behaviors that run before/after tool use or on session events
 - **MCP Servers** — connected tools and integrations (local, claude.ai connectors, plugins)
+- **Scripts** — local automation scripts, what each one does, what invokes it, and whether it's actually scheduled (checked against the live scheduler, not just a comment in the file) (optional, see below)
 - **Knowledge Library** — explanatory notes about how Claude Code works (optional, see below)
 
 The dashboard supports dark mode, light mode, and system preference, with a toggle in the header.
@@ -48,6 +49,16 @@ Claude will scan your live setup and write two files to `~/Desktop/Claude Capabi
 | `claude-code-capabilities-styled_1.html` | Styled visual dashboard — open in a browser |
 
 If the folder doesn't exist yet, it's created automatically. **No existing files required** — works on first run.
+
+---
+
+## Scripts (optional)
+
+If you have local automation scripts — things invoked by a skill's instructions, or scheduled to run unattended via `launchd`/`cron`/etc. — the dashboard will include a **Scripts** section documenting each one: what it does, what invokes it, and whether it's actually scheduled.
+
+That last part matters: the skill checks the *live* scheduler state (`launchctl list <label>`, `crontab -l`, the plist's own `StartCalendarInterval`) rather than trusting a script's own header comment about when it runs. A script that documents itself as "runs daily via cron" but was never actually installed anywhere gets flagged with **⚠ no active trigger found** instead of being reported as working.
+
+If you have no such scripts, the section is simply omitted — nothing breaks.
 
 ---
 
