@@ -13,6 +13,7 @@ Run `/dashboard-refresh` when:
 - You want to create the dashboard for the first time (no files needed)
 - You installed a new plugin, agent, or skill
 - You added or removed MCP servers or hooks
+- You added, removed, or rescheduled a local automation script
 - You added files to `~/.claude/knowledge/`
 
 ## Target Files
@@ -62,6 +63,12 @@ Scan these sources:
 - Local servers: read `~/.claude/settings.json` → `mcpServers` key. These go under "Core · Local (Developer Settings)"
 - claude.ai connectors: infer from `mcp__claude_ai_<Name>__*` tool names in the system-reminder. Each unique `<Name>` is a connector. These go under "Core · claude.ai Connected Connectors"
 - Plugin MCPs: look for `mcp__plugin_<plugin>_<server>__*` tool prefixes in the system-reminder
+
+### Scripts (optional)
+- Check common local automation locations: `~/.claude/cron-jobs/` (or an equivalent project-specific scripts folder your setup uses), plus any scheduler that's actually active on this machine — `launchd` on macOS (`ls ~/Library/LaunchAgents/`, `launchctl list <label>`), `crontab -l`, or `systemd --user` timers on Linux
+- For each script found, note: **purpose** (what it does — read the file, don't guess), **invoked by** (which skill's instructions call it, if any — grep the skills folder for the script's filename), and **scheduled via** (the confirmed active trigger, e.g. `launchd — com.you.job-name, Mon-Fri 14:00`, or **⚠ no active trigger found** if you checked and it isn't wired up anywhere)
+- **Verify scheduling claims, don't infer them from a script's own header comment.** A script's comment saying "runs daily via cron" doesn't mean it does — check the actual scheduler state (`launchctl list <label>`, not just a keyword grep over `launchctl list`; `crontab -l`; the plist file's own `StartCalendarInterval`) before reporting it as active
+- If nothing is found in these locations, skip this section entirely — do not create an empty section
 
 ### Knowledge Library (optional)
 - Check if `~/.claude/knowledge/` exists
@@ -165,6 +172,18 @@ Write `claude-code-capabilities.md` using today's date. Structure:
 |---|---|
 ...
 
+---
+
+## Scripts
+> Only include this section if you found scripts per Step 2. Group by location.
+
+### `~/.claude/cron-jobs/` — scheduled maintenance scripts
+| Script | Purpose | Scheduled via |
+|---|---|---|
+| `script-name.sh` | What it does | `launchd` — `com.you.label`, schedule (confirmed active) — or **⚠ no active trigger found** |
+
+> Add one table per script location you scanned, and a separate table for any relevant purpose/invoked-by columns your skills scripts use (e.g. `| Script | Purpose | Invoked by |` for scripts a skill calls rather than a scheduler).
+
 ## Knowledge Library
 > Only include this section if `~/.claude/knowledge/` exists and contains .md files.
 
@@ -259,6 +278,7 @@ The complete file structure to use (or preserve) for the HTML:
   .icon-skills     { background:linear-gradient(135deg,rgba(107,255,216,0.3),rgba(107,255,216,0.1)); }
   .icon-hooks      { background:linear-gradient(135deg,rgba(255,217,107,0.3),rgba(255,217,107,0.1)); }
   .icon-mcp        { background:linear-gradient(135deg,rgba(255,107,157,0.3),rgba(255,107,157,0.1)); }
+  .icon-scripts    { background:linear-gradient(135deg,rgba(124,107,255,0.25),rgba(255,217,107,0.15)); }
   .icon-knowledge  { background:linear-gradient(135deg,rgba(107,255,216,0.2),rgba(124,107,255,0.2)); }
   h2 { font-family:'Syne',sans-serif; font-size:28px; font-weight:700; letter-spacing:-0.01em; }
   .section-count { margin-left:auto; font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); letter-spacing:0.08em; }
@@ -337,7 +357,7 @@ The complete file structure to use (or preserve) for the HTML:
     <div class="header-meta">
       <strong>Generated</strong> YYYY-MM-DD<br>
       <strong>Agents</strong> N · <strong>Skills</strong> N<br>
-      <strong>Hooks</strong> N · <strong>MCP Servers</strong> N
+      <strong>Hooks</strong> N · <strong>MCP Servers</strong> N · <strong>Scripts</strong> N
       <div class="theme-toggle">
         <button class="theme-btn" data-mode="dark" onclick="setTheme('dark')">🌙 Dark</button>
         <button class="theme-btn" data-mode="light" onclick="setTheme('light')">☀️ Light</button>
@@ -352,6 +372,7 @@ The complete file structure to use (or preserve) for the HTML:
       <a href="#skills">Skills</a>
       <a href="#hooks">Hooks</a>
       <a href="#mcp">MCP Servers</a>
+      <a href="#scripts">Scripts</a>
       <a href="#knowledge">Knowledge</a>
     </div>
   </nav>
@@ -490,6 +511,27 @@ The complete file structure to use (or preserve) for the HTML:
     </div>
   </section>
 
+  <!-- SCRIPTS SECTION — only render if scripts were found per Step 2 -->
+  <section id="scripts">
+    <div class="section-header">
+      <div class="section-icon icon-scripts">📜</div>
+      <h2>Scripts</h2>
+      <span class="section-count">N scripts</span>
+    </div>
+
+    <p style="font-size:13px;color:var(--muted);margin-bottom:24px;max-width:720px">Scripts that run outside the conversational tool-call model — invoked by a skill's instructions, or scheduled to run unattended.</p>
+
+    <div class="subsection">
+      <div class="subsection-label">~/.claude/cron-jobs/</div>
+      <table class="hook-table">
+        <thead><tr><th>Script</th><th>Purpose</th><th>Scheduled via</th></tr></thead>
+        <tbody>
+          <tr><td>script-name.sh</td><td>What it does</td><td>launchd — com.you.label, schedule (confirmed active)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
   <!-- KNOWLEDGE SECTION — only render if ~/.claude/knowledge/ exists and has .md files -->
   <section id="knowledge">
     <div class="section-header">
@@ -548,9 +590,9 @@ Fill in the placeholder content (`N`, `YYYY-MM-DD`, card lists, etc.) from the d
 Update the header stats line in the HTML:
 ```html
 <strong>Agents</strong> 26 · <strong>Skills</strong> 130+<br>
-<strong>Hooks</strong> 23 · <strong>MCP Servers</strong> 9
+<strong>Hooks</strong> 23 · <strong>MCP Servers</strong> 9 · <strong>Scripts</strong> 5
 ```
-Count actual items from Step 2. Use `N+` notation if a section has many items from a plugin (e.g. `130+` skills).
+Count actual items from Step 2. Use `N+` notation if a section has many items from a plugin (e.g. `130+` skills). Omit `· Scripts N` from the header entirely if the Scripts section wasn't included (nothing found in Step 2).
 
 ---
 
@@ -561,6 +603,7 @@ After writing both files confirm:
 - Counts in HTML header match actual totals
 - All agents/skills/hooks/MCPs from Step 2 are present
 - Knowledge section present if `~/.claude/knowledge/` exists, absent if it doesn't
+- Scripts section present only if you actually found scripts in Step 2, and every "scheduled via" claim is backed by a real check, not a script comment
 - In Refresh mode: no items removed unless they genuinely no longer exist
 
 ---
@@ -572,3 +615,4 @@ After writing both files confirm:
 - claude.ai connectors come from `mcp__claude_ai_<Name>__*` tool prefixes. Each unique `<Name>` is one connector.
 - If the target folder doesn't exist, the Write tool will create it automatically.
 - Knowledge Library section is optional and plugin-independent — include it only if `~/.claude/knowledge/` exists. Any user can create this folder to get the section.
+- Scripts section is optional — include it only if Step 2 actually found scripts. Don't trust a script's own header comment about how/when it runs; confirm against the live scheduler state.
