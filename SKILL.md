@@ -88,6 +88,21 @@ Write `claude-code-capabilities.md` using today's date. Structure:
 
 ---
 
+## Why This Dashboard Is Useful
+
+| Reason | What it means |
+|---|---|
+| Single source of truth | Every agent, skill, hook, connector, and script in one place — instead of scattered across `settings.json`, plugin manifests, and memory files. |
+| Onboarding / context refresh | Re-orient on what's configured without rediscovering it each session. |
+| Change & drift detection | Diff this snapshot against the last one to see what was added, removed, or changed. |
+| First-pass breach/incident checklist | A starting point for what has access and what's auto-approved — pair with your own credentials/permissions audit for a full security review. |
+| Debugging aid | Confirm a hook, skill, or trigger is actually registered before assuming the bug lives elsewhere. |
+| Cleanup candidate list | Surface stale or unused agents and skills worth pruning. |
+| Shareable snapshot | Hand to a collaborator or incident responder without exposing actual secret values. |
+| Automation audit trail | Every cron job, launchd agent, and RemoteTrigger routine that runs unattended — with confirmed, not assumed, scheduling status. |
+
+---
+
 ## Agents
 
 ### Core (Custom)
@@ -192,6 +207,12 @@ Write `claude-code-capabilities.md` using today's date. Structure:
 | `filename` | First # heading from the file |
 
 > Location: `~/.claude/knowledge/`
+
+---
+
+## Scope & Limitations
+
+⚠️ **Single-machine, point-in-time snapshot** (as of the date above). The Scripts section lists *registered* RemoteTrigger/Cowork cloud routines if you have any, but not ad-hoc Cowork tasks or what happens inside a Cowork sandbox — and it doesn't cover other machines or anything added since the last `/dashboard-refresh`. This dashboard also does not audit credentials, secrets, or permission auto-approvals — it's a capability inventory, not a security audit. Useful as a **first checklist**, not a complete source of truth on its own.
 ```
 
 ---
@@ -368,14 +389,34 @@ The complete file structure to use (or preserve) for the HTML:
 
   <nav>
     <div class="nav-inner">
+      <a href="#why">Why This</a>
       <a href="#agents">Agents</a>
       <a href="#skills">Skills</a>
       <a href="#hooks">Hooks</a>
       <a href="#mcp">MCP Servers</a>
       <a href="#scripts">Scripts</a>
       <a href="#knowledge">Knowledge</a>
+      <a href="#scope">Scope</a>
     </div>
   </nav>
+
+  <!-- WHY THIS DASHBOARD SECTION — always render, right after </nav>, before Agents -->
+  <section id="why">
+    <div class="section-header">
+      <div class="section-icon icon-scripts">💡</div>
+      <h2>Why This Dashboard Is Useful</h2>
+    </div>
+    <div class="card-grid">
+      <div class="card"><div class="card-name">Single source of truth</div><div class="card-desc">Every agent, skill, hook, connector, and script in one place — instead of scattered across settings.json, plugin manifests, and memory files.</div></div>
+      <div class="card"><div class="card-name">Onboarding / context refresh</div><div class="card-desc">Re-orient on what's configured without rediscovering it each session.</div></div>
+      <div class="card"><div class="card-name">Change &amp; drift detection</div><div class="card-desc">Diff this snapshot against the last one to see what was added, removed, or changed.</div></div>
+      <div class="card"><div class="card-name">First-pass breach/incident checklist</div><div class="card-desc">A starting point for what has access and what's auto-approved — pair with your own credentials/permissions audit for a full security review.</div></div>
+      <div class="card"><div class="card-name">Debugging aid</div><div class="card-desc">Confirm a hook, skill, or trigger is actually registered before assuming the bug lives elsewhere.</div></div>
+      <div class="card"><div class="card-name">Cleanup candidate list</div><div class="card-desc">Surface stale or unused agents and skills worth pruning.</div></div>
+      <div class="card"><div class="card-name">Shareable snapshot</div><div class="card-desc">Hand to a collaborator or incident responder without exposing actual secret values.</div></div>
+      <div class="card"><div class="card-name">Automation audit trail</div><div class="card-desc">Every cron job, launchd agent, and RemoteTrigger routine that runs unattended — with confirmed, not assumed, scheduling status.</div></div>
+    </div>
+  </section>
 
   <!-- AGENTS SECTION -->
   <section id="agents">
@@ -553,6 +594,17 @@ The complete file structure to use (or preserve) for the HTML:
     <div class="invoke-hint">Explanatory notes on how Claude Code works — concepts, comparisons, mental models. Not rules (memory) or prompts (skills).</div>
   </section>
 
+  <!-- SCOPE & LIMITATIONS — always render, at the very end, after Knowledge -->
+  <section id="scope">
+    <div class="section-header">
+      <div class="section-icon icon-scripts">⚠️</div>
+      <h2>Scope &amp; Limitations</h2>
+    </div>
+    <p style="font-size:13px;color:var(--table-cell);line-height:1.6;max-width:720px">
+      <strong style="color:var(--text)">Single-machine, point-in-time snapshot</strong> (as of the date above). The Scripts section lists <em>registered</em> RemoteTrigger/Cowork cloud routines if you have any, but not ad-hoc Cowork tasks or what happens inside a Cowork sandbox — and it doesn't cover other machines or anything added since the last <code style="background:rgba(255,107,157,0.12); border-radius:4px; padding:1px 5px;">/dashboard-refresh</code>. This dashboard also does not audit credentials, secrets, or permission auto-approvals — it's a capability inventory, not a security audit. Useful as a <strong style="color:var(--text)">first checklist</strong>, not a complete source of truth on its own.
+    </p>
+  </section>
+
 </div>
 
 <script>
@@ -599,9 +651,10 @@ Count actual items from Step 2. Use `N+` notation if a section has many items fr
 ## Step 6 — Verify
 
 After writing both files confirm:
-- Date updated to today in both files
+- Date updated to today in both files, including the Scope & Limitations section (which restates "as of the date above")
 - Counts in HTML header match actual totals
 - All agents/skills/hooks/MCPs from Step 2 are present
+- "Why This Dashboard Is Useful" section present near the top (right after nav) and Scope & Limitations section present at the very bottom — these are fixed content, always render both regardless of mode
 - Knowledge section present if `~/.claude/knowledge/` exists, absent if it doesn't
 - Scripts section present only if you actually found scripts in Step 2, and every "scheduled via" claim is backed by a real check, not a script comment
 - In Refresh mode: no items removed unless they genuinely no longer exist
@@ -616,3 +669,4 @@ After writing both files confirm:
 - If the target folder doesn't exist, the Write tool will create it automatically.
 - Knowledge Library section is optional and plugin-independent — include it only if `~/.claude/knowledge/` exists. Any user can create this folder to get the section.
 - Scripts section is optional — include it only if Step 2 actually found scripts. Don't trust a script's own header comment about how/when it runs; confirm against the live scheduler state.
+- "Why This Dashboard Is Useful" (top, right after nav) and "Scope & Limitations" (bottom, after Knowledge) are both fixed, always-rendered content — not derived from Step 2 scanning, and not optional. Be precise about what's actually covered: if you added a Scripts section listing RemoteTrigger/Cowork routines, don't let the disclaimer claim Cowork is excluded entirely — scope it to what's genuinely missing (ad-hoc Cowork tasks, sandbox internals, other machines, changes since last refresh). This template intentionally omits credentials/secrets and permissions auditing — say so plainly rather than implying broader security coverage than the dashboard actually provides.
