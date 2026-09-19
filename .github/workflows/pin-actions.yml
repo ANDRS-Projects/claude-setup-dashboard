@@ -1,0 +1,62 @@
+name: Pin GitHub Actions
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+
+jobs:
+  check-pinned-actions:
+    name: Verify third-party actions are pinned to a commit SHA
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for floating third-party action references
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          FAILED=0
+          while IFS= read -r match; do
+            file="${match%%:*}"
+            ref_full="${match#*:}"
+            repo="${ref_full%@*}"
+            ref="${ref_full##*@}"
+
+            # Trust first-party GitHub-maintained actions by tag — only enforce
+            # SHA pinning on third-party actions, where a compromised maintainer
+            # account or hijacked tag is the realistic supply-chain risk.
+            case "$repo" in
+              actions/*|github/*) continue ;;
+            esac
+
+            # Already pinned to a full commit SHA — fine.
+            if echo "$ref" | grep -qE '^[0-9a-f]{40}$'; then
+              continue
+            fi
+
+            FAILED=1
+            sha=$(gh api "repos/$repo/commits/$ref" --jq '.sha' 2>/dev/null || echo "")
+            # Only trust $sha if it's actually a commit SHA — gh api can print an
+            # error body to stdout (e.g. org IP allow-lists, private repos, rate
+            # limits) without a nonzero exit our `|| echo ""` would catch.
+            if echo "$sha" | grep -qE '^[0-9a-f]{40}$'; then
+              echo "::error file=$file::Unpinned third-party action '$repo@$ref' — pin it to a commit SHA. Corrected line: uses: $repo@$sha # $ref"
+            else
+              echo "::error file=$file::Unpinned third-party action '$repo@$ref' — could not auto-resolve '$ref' to a commit (action's org may block API access, e.g. an IP allow-list); pin it manually to a commit SHA."
+            fi
+          done < <(grep -rnoE 'uses:[[:space:]]*[A-Za-z0-9._-]+/[A-Za-z0-9._-]+@[A-Za-z0-9._/-]+' .github/workflows/*.yml | sed -E 's/^([^:]+):[0-9]+:uses:[[:space:]]*/\1:/')
+
+          if [ "$FAILED" -eq 1 ]; then
+            echo ""
+            echo "One or more third-party actions are referenced by a mutable tag/branch instead of a commit SHA."
+            echo "This only checks that the reference is immutable going forward — it does not vet whether the"
+            echo "resolved commit is itself trustworthy. Review the diff before merging a new pin, same as any dependency bump."
+            exit 1
+          fi
+          echo "All third-party action references are pinned to a commit SHA."
