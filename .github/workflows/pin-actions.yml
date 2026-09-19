@@ -42,10 +42,13 @@ jobs:
 
             FAILED=1
             sha=$(gh api "repos/$repo/commits/$ref" --jq '.sha' 2>/dev/null || echo "")
-            if [ -n "$sha" ]; then
+            # Only trust $sha if it's actually a commit SHA — gh api can print an
+            # error body to stdout (e.g. org IP allow-lists, private repos, rate
+            # limits) without a nonzero exit our `|| echo ""` would catch.
+            if echo "$sha" | grep -qE '^[0-9a-f]{40}$'; then
               echo "::error file=$file::Unpinned third-party action '$repo@$ref' — pin it to a commit SHA. Corrected line: uses: $repo@$sha # $ref"
             else
-              echo "::error file=$file::Unpinned third-party action '$repo@$ref' — could not auto-resolve '$ref' to a commit; pin it manually to a commit SHA."
+              echo "::error file=$file::Unpinned third-party action '$repo@$ref' — could not auto-resolve '$ref' to a commit (action's org may block API access, e.g. an IP allow-list); pin it manually to a commit SHA."
             fi
           done < <(grep -rnoE 'uses:[[:space:]]*[A-Za-z0-9._-]+/[A-Za-z0-9._-]+@[A-Za-z0-9._/-]+' .github/workflows/*.yml | sed -E 's/^([^:]+):[0-9]+:uses:[[:space:]]*/\1:/')
 
