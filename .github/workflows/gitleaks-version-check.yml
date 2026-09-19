@@ -20,7 +20,7 @@ jobs:
   check-version:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Compare pinned vs. latest Gitleaks release
         id: check
@@ -37,7 +37,7 @@ jobs:
 
       - name: Open PR with the bump
         if: steps.check.outputs.latest != '' && steps.check.outputs.latest != steps.check.outputs.current
-        uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
           commit-message: "Bump pinned Gitleaks version to v${{ steps.check.outputs.latest }}"
           title: "Bump pinned Gitleaks version to v${{ steps.check.outputs.latest }}"
